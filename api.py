@@ -1,8 +1,23 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3
 
 app = FastAPI()
+
+# Habilitar CORS
+origins = [
+    "https://uac-filial-sicuani.netlify.app/",  # Asegúrate de reemplazarlo por el dominio de tu frontend
+    "http://127.0.0.1:5500",  # Dirección local de Live Server
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Permitir los orígenes especificados
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir cualquier método (GET, POST, etc.)
+    allow_headers=["*"],  # Permitir cualquier encabezado
+)
 
 class Vote(BaseModel):
     item_id: str  # ID único de la carta
@@ -11,7 +26,7 @@ class Vote(BaseModel):
 def init_db():
     conn = sqlite3.connect("votes.db")
     c = conn.cursor()
-    c.execute('''
+    c.execute(''' 
         CREATE TABLE IF NOT EXISTS votes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             item_id TEXT NOT NULL,
